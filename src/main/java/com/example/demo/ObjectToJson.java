@@ -43,8 +43,8 @@ public class ObjectToJson {
 	
 	// json 데이터 가져오기
 	public List<Row> getJsonData() throws JSONException, IOException {
-	    JSONObject json = this.readJsonFromUrl("http://openapi.foodsafetykorea.go.kr/api/575b452f24504f6f983e/COOKRCP01/json/1/10");
-	    //System.out.println(json.get("COOKRCP01"));
+	    JSONObject json = this.readJsonFromUrl("http://openapi.foodsafetykorea.go.kr/api/575b452f24504f6f983e/COOKRCP01/json/5/10");
+	    System.out.println(json.get("COOKRCP01"));
 	    
         Gson gson = new Gson();
         Cookrcp01 cookrcp = gson.fromJson(json.get("COOKRCP01").toString(), Cookrcp01.class);
@@ -52,6 +52,51 @@ public class ObjectToJson {
         return cookrcp.getRow();
 	}
 	
+	// 요리 방법
+	public int parseFoodType(String cookingType) {
+		int result = 1;
+
+		if(cookingType.equals("밥")) {
+			result = 1;
+		}else if(cookingType.equals("국&찌개")) {
+			result = 2;
+		}else if(cookingType.equals("반찬")) {
+			result = 3;
+		}else if(cookingType.equals("일품")) {
+			result = 4;
+		}else if(cookingType.equals("후식")) {
+			result = 5;
+		}else {
+			result = 1;
+		}
+		
+		return result;
+	}
+	
+	// 요리 방법
+	public int parseCookingType(String cookingType) {
+			int result = 1;
+
+		
+		if(cookingType.equals("끊이기")) {
+			result = 1;
+		}else if(cookingType.equals("굽기")) {
+			result = 2;
+		}else if(cookingType.equals("찌기")) {
+			result = 3;
+		}else if(cookingType.equals("기타")) {
+			result = 4;
+		}else if(cookingType.equals("튀기기")) {
+			result = 5;
+		}else if(cookingType.equals("볶기")){
+			result = 6;
+		}else {
+			result = 1;
+		}
+		  
+		  
+		return result;
+	}
 	
 	
 	public List<Food> getFoodList(List<Row> rows) {
@@ -72,16 +117,16 @@ public class ObjectToJson {
         	food.setSmallImageLocation(rows.get(i).getATT_FILE_NO_MAIN()); // 이미지 소 
         	food.setBigImageLocation(rows.get(i).getATT_FILE_NO_MK()); // 이미지 대 
         	
+        	food.setCookingTypeId(this.parseFoodType(rows.get(i).getRCP_WAY2().trim())); // 요리 방법
+        	food.setFoodTypeId(this.parseCookingType(rows.get(i).getRCP_PAT2().trim())); // 요리 종류
         	
         	// 재료 낱개 
         	String[] incredients = rows.get(i).getRCP_PARTS_DTLS().split(",");
-        	
-
-        	
+       	
         	List<Incredient> incredientList = this.getIncredientsList(incredients);
         	food.setIncredientList(incredientList); // 재료 붙이기 
         	
-        	incredientList.forEach(v -> System.out.println(v.getName()));       	
+        	//incredientList.forEach(v -> System.out.println(v.getName()));       	
         	
         	List<Recipe> recipeList = this.getRecipeList(rows.get(i));
         	food.setRecipes(recipeList);
@@ -350,7 +395,7 @@ public class ObjectToJson {
 		
 
 		
-	//	System.out.println(list.size());
+		System.out.println(list.size());
 		
 	}
 
